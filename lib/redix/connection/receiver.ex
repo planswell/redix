@@ -47,8 +47,8 @@ defmodule Redix.Connection.Receiver do
   end
 
   @doc false
-  def handle_info({:tcp, socket, data}, %{socket: socket} = state) do
-    :ok = :inet.setopts(socket, active: :once)
+  def handle_info({:ssl, socket, data}, %{socket: socket} = state) do
+    :ok = :ssl.setopts(socket, active: :once)
 
     state = new_data(state, data)
 
