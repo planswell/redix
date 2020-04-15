@@ -11,6 +11,7 @@ defmodule Redix.StartOptions do
   @default_options [
     socket_opts: [],
     ssl: false,
+    aws: false,
     sync_connect: false,
     backoff_initial: 500,
     backoff_max: 30000,

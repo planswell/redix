@@ -87,7 +87,7 @@ defmodule Redix.Connection do
   def init(opts) do
     transport = if(opts[:ssl], do: :ssl, else: :gen_tcp)
     queue_table = :ets.new(:queue, [:ordered_set, :public])
-    {:ok, socket_owner} = SocketOwner.start_link(self(), opts, queue_table)
+    {:ok, socket_owner} = SocketOwner.start_link(self(), opts |> aws_config() |> IO.inspect(label: :socket_config), queue_table)
 
     data = %__MODULE__{
       opts: opts,
@@ -108,6 +108,18 @@ defmodule Redix.Connection do
       end
     else
       {:ok, :connecting, data}
+    end
+  end
+
+  defp aws_config(config) do
+    if Keyword.get(config, :ssl, false) && Keyword.get(config, :aws, false) do
+      Keyword.put(config, :socket_opts,
+        customize_hostname_check: [
+          match_fun: :public_key.pkix_verify_hostname_match_fun(:https)
+        ]
+      )
+    else
+      config
     end
   end
 
